@@ -1,30 +1,39 @@
+
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-        <title>mui-player 创建多个播放器</title>
-        <link rel="stylesheet" href="/mui-player.min.css">
+        <title>mui-player 使用 dash.js</title>
+        <link rel="stylesheet" href="./mui-player.min.css">
         <script src="./static/js/config.js"></script>
-        <script src="/mui-player.min.js"></script>
+        <script src="./mui-player.min.js"></script>
+        <script src="./dash.all.min.js"></script>
     </head>
-    
+
 	<body>
-        <h3 style="text-align: center;">创建多个播放器</h3>
-        <div id="mui-player" style="width: 550px;display: inline-block;"></div> 
-
-        <div id="mui-player-2" style="width: 550px;display: inline-block;"></div>
+        <h3 style="text-align: center;">DASH</h3>
+        <div id="mui-player" style="max-width: 700px;margin: auto"></div>
     </body>
-    
-    <script>
-        var config_1 = Object.assign({ autoplay:true },window.playerConfig);
-        new MuiPlayer(config_1);
 
-        var config_2 = Object.assign({ autoplay:true },window.playerConfig);
-        config_2.container = '#mui-player-2';
-        config_2.themeColor = '#55c612';
-        config_2.src = 'http://115.205.96.41:32400/video/:/transcode/universal/start.mpd?hasMDE=1&path=%2Flibrary%2Fmetadata%2F208&mediaIndex=0&partIndex=0&protocol=dash&subtitleSize=100&audioBoost=100&addDebugOverlay=0&autoAdjustQuality=0&directStreamAudio=1&mediaBufferSize=102400&subtitles=burn&Accept-Language=zh&X-Plex-Session-Identifier=kzmynhzyn3j3iy2r8my3a9n5&X-Plex-Platform=Safari&X-Plex-Platform-Version=93.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=bundled&X-Plex-Device-Screen-Resolution=1694x822%2C1920x1080&X-Plex-Token=PkyEB7uz4w8n6sxu5VJ9&X-Plex-Language=zh';
-        config_2.poster = 'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/subtitle_poster.jpg';
-        new MuiPlayer(config_2);
+    <script>
+        var config = window.playerConfig;
+        config.src = 'http://115.205.96.41:32400/video/:/transcode/universal/start.mpd?hasMDE=1&path=%2Flibrary%2Fmetadata%2F208&mediaIndex=0&partIndex=0&protocol=dash&subtitleSize=100&audioBoost=100&addDebugOverlay=0&autoAdjustQuality=0&directStreamAudio=1&mediaBufferSize=102400&subtitles=burn&Accept-Language=zh&X-Plex-Session-Identifier=kzmynhzyn3j3iy2r8my3a9n5&X-Plex-Platform=Safari&X-Plex-Platform-Version=93.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=bundled&X-Plex-Device-Screen-Resolution=1694x822%2C1920x1080&X-Plex-Token=PkyEB7uz4w8n6sxu5VJ9&X-Plex-Language=zh';
+        config.parse = {
+            customKernel:function(video,src) {
+                let dashMedia = dashjs.MediaPlayer().create();
+                dashMedia.initialize(video, src,false);
+                dashMedia.on(dashjs.MediaPlayer.events.ERROR,function(errMes) {
+                    console.error(errMes);
+                    // 发送错误报告
+                    mp.sendError(errMes);
+
+                    dashMedia.reset();
+                })
+            }
+        }
+
+        console.log(config);
+        var mp = new MuiPlayer(config);
     </script>
 </html>
